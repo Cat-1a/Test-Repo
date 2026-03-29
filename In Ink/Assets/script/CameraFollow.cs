@@ -6,14 +6,16 @@ public class CameraFollow : MonoBehaviour
 {
     [Header("跟随设置")]
     public Transform target;
+    [Header("相机参数")]
     public float smoothSpeed =1f;
-    public Vector3 offset = new Vector3(0, 0, 15);
-
-    private void LateUpdate()
+    [Header("位置参数")]
+    public Vector2 bottomLeftOffset = new Vector2(25f, 15f);
+   
+    void LateUpdate()
     {
-        Vector3 targetPot=target.position+offset;
-        Vector3 desiredPos = new Vector3(targetPot.x, targetPot.y, -10f);
-        Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPos, smoothSpeed);
+        Vector3 desiredPosition = target.position + new Vector3(bottomLeftOffset.x, bottomLeftOffset.y, 0);
+        desiredPosition.z = -10f;
+        Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
         transform.position = smoothedPosition;
     }
 }

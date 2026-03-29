@@ -8,7 +8,7 @@ public class PlayerController : MonoBehaviour
     [Header("移动设置")]
     public float moveSpeed = 15f;
     [Header("跳跃设置")]
-    public float jumpForce = 7.0f;
+    public float jumpForce = 12.0f;
     public LayerMask groundLayer;
     [Header("动画组件")]
     public Animator anim;
@@ -18,7 +18,6 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
     }
 
