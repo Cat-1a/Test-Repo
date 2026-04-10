@@ -6,12 +6,14 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [Header("移动设置")]
-    public float moveSpeed = 15f;
+    public float moveSpeed = 30f;
     [Header("跳跃设置")]
     public float jumpForce = 12.0f;
     public LayerMask groundLayer;
     [Header("动画组件")]
     public Animator anim;
+    [Header("复位设置")]
+    public Transform respawnPoint;
     private Rigidbody2D rb;
     private bool isFacingRingt = true;
     private float horizontalInput;
@@ -41,6 +43,11 @@ public class PlayerController : MonoBehaviour
         {
             Flip();
         }
+        //起跳 & 下落
+        bool grounded=isGrounded();
+        anim.SetBool("isJumping", !grounded);
+        anim.SetBool("isFalling", !grounded & rb.velocity.y < 0);
+
     }
 
     void FixedUpdate()
@@ -69,12 +76,17 @@ public class PlayerController : MonoBehaviour
         transform.localScale = scale;
     }
 
-    private void OnDrawGizmos()
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        Gizmos.color = Color.red;
-        Vector2 origin =transform.position;
-        float ranycastLength = 0.2f;
-        Vector2 endPoint = origin + Vector2.down * ranycastLength;
-        Gizmos.DrawLine(origin, endPoint);
+        if (other.CompareTag("RespawnPoint"))
+        {
+            if (respawnPoint != null)
+                transform.position = respawnPoint.position;
+            else
+                transform.position = Vector3.zero;
+
+            if (rb != null)
+                rb.velocity = Vector2.zero;
+        }
     }
 }
