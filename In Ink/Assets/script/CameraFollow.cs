@@ -4,18 +4,36 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
-    [Header("跟随设置")]
+    public static CameraFollow instance;
+
     public Transform target;
-    [Header("相机参数")]
-    public float smoothSpeed =1f;
-    [Header("位置参数")]
-    public Vector2 bottomLeftOffset = new Vector2(25f, 15f);
-   
+    public Vector3 offset;
+    public float smoothSpeed = 4;
+
+    public float normalSize = 5;
+    public float zoomSize = 8;
+    private Camera cam;
+
+    void Awake()
+    {
+        instance = this;
+        cam = GetComponent<Camera>();
+    }
+
     void LateUpdate()
     {
-        Vector3 desiredPosition = target.position + new Vector3(bottomLeftOffset.x, bottomLeftOffset.y, 0);
-        desiredPosition.z = -10f;
-        Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
-        transform.position = smoothedPosition;
+        if (target == null) return;
+        Vector3 desired = target.position + offset;
+        transform.position = Vector3.Lerp(transform.position, desired, smoothSpeed * Time.deltaTime);
+    }
+
+    public void ZoomOut()
+    {
+        cam.orthographicSize = zoomSize;
+    }
+
+    public void ZoomIn()
+    {
+        cam.orthographicSize = normalSize;
     }
 }

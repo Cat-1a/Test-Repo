@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Grabbable
   - RespawnPoint
+  - S
+  - Flag
   layers:
   - Default
   - TransparentFX

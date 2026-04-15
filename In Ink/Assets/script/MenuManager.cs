@@ -1,171 +1,94 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 using UnityEngine.UI;
 
 public class MenuManager : MonoBehaviour
 {
-    [Header("主菜单界面")]
-    public CanvasGroup mainMenuCanvas;
-    public Button btnStart;
-    public Button btnHelp;
-    public Button btnSetting;
-    public Button btnExit;
+    [Header("面板")]
+    public CanvasGroup ui1Canvas;
+    public CanvasGroup ui2Canvas;
+    public CanvasGroup ui3Canvas;
 
-    [Header("说明界面")]
-    public CanvasGroup helpCanvas;
-    public Button btnHelpBack;
+    [Header("设置")]
+    public Slider sliderVol;
+    public Slider sliderBright;
+    public TMP_Text textVol;
+    public TMP_Text textBright;
 
-    [Header("设置界面")]
-    public CanvasGroup settingCanvas;
-    public Slider sliderBrightness;
-    public Slider sliderVolume;
-    public Text textBrightnessValue;
-    public Text textVolumeValue;
-    public Button btnSettingBack;
-
-    [Header("游戏控制")]
-    public PlayerController playerController; // 拖入你的PlayerController脚本
-
-    private bool isGamePaused = false;
+    [Header("角色")]
+    public PlayerController player;
 
     void Start()
     {
-        // 初始化界面状态
-        ShowMainMenu();
-        HideHelpMenu();
-        HideSettingMenu();
-
-        // 绑定主菜单按钮事件
-        btnStart.onClick.AddListener(StartGame);
-        btnHelp.onClick.AddListener(ShowHelpMenu);
-        btnSetting.onClick.AddListener(ShowSettingMenu);
-        btnExit.onClick.AddListener(QuitGame);
-
-        // 绑定说明/设置返回按钮事件
-        btnHelpBack.onClick.AddListener(ShowMainMenu);
-        btnSettingBack.onClick.AddListener(ShowMainMenu);
-
-        // 绑定滑动条事件
-        sliderBrightness.onValueChanged.AddListener(OnBrightnessChanged);
-        sliderVolume.onValueChanged.AddListener(OnVolumeChanged);
-
-        // 初始化滑动条数值显示
-        OnBrightnessChanged(sliderBrightness.value);
-        OnVolumeChanged(sliderVolume.value);
-
-        // 游戏启动时暂停，显示主菜单
-        PauseGame();
-
-        // 加载保存的设置
-        float savedBrightness = PlayerPrefs.GetFloat("Brightness", 100f);
-        float savedVolume = PlayerPrefs.GetFloat("Volume", 100f);
-        sliderBrightness.value = savedBrightness;
-        sliderVolume.value = savedVolume;
+        // 初始化音量
+        sliderVol.value = AudioListener.volume * 100;
+        textVol.text = $"声音：{Mathf.RoundToInt(sliderVol.value)}";
+        // 初始化亮度
+        sliderBright.value = 100;
+        textBright.text = $"亮度：{Mathf.RoundToInt(sliderBright.value)}";
     }
 
-    void Update()
-    {
-        // 按ESC键切换菜单
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            if (isGamePaused)
-            {
-                // 菜单打开时，ESC关闭菜单，继续游戏
-                if (helpCanvas.alpha > 0) HideHelpMenu();
-                if (settingCanvas.alpha > 0) HideSettingMenu();
-                ShowMainMenu();
-                ResumeGame();
-            }
-            else
-            {
-                // 游戏进行时，ESC打开主菜单，暂停游戏
-                ShowMainMenu();
-                PauseGame();
-            }
-        }
-    }
-
-    #region 界面控制
-    // 显示主菜单
-    void ShowMainMenu()
-    {
-        mainMenuCanvas.alpha = 1;
-        mainMenuCanvas.interactable = true;
-        mainMenuCanvas.blocksRaycasts = true;
-    }
-
-    // 隐藏主菜单
-    void HideMainMenu()
-    {
-        mainMenuCanvas.alpha = 0;
-        mainMenuCanvas.interactable = false;
-        mainMenuCanvas.blocksRaycasts = false;
-    }
-
-    // 显示说明菜单
-    void ShowHelpMenu()
-    {
-        HideMainMenu();
-        helpCanvas.alpha = 1;
-        helpCanvas.interactable = true;
-        helpCanvas.blocksRaycasts = true;
-    }
-
-    // 隐藏说明菜单
-    void HideHelpMenu()
-    {
-        helpCanvas.alpha = 0;
-        helpCanvas.interactable = false;
-        helpCanvas.blocksRaycasts = false;
-    }
-
-    // 显示设置菜单
-    void ShowSettingMenu()
-    {
-        HideMainMenu();
-        settingCanvas.alpha = 1;
-        settingCanvas.interactable = true;
-        settingCanvas.blocksRaycasts = true;
-    }
-
-    // 隐藏设置菜单
-    void HideSettingMenu()
-    {
-        settingCanvas.alpha = 0;
-        settingCanvas.interactable = false;
-        settingCanvas.blocksRaycasts = false;
-    }
-    #endregion
-
-    #region 游戏控制
     // 开始游戏
-    void StartGame()
+    public void StartGame()
     {
-        HideMainMenu();
-        ResumeGame();
+        Debug.Log("StartGame 按钮被点击！");
+        // 隐藏主菜单
+        ui1Canvas.alpha = 0;
+        ui1Canvas.interactable = false;
+        ui1Canvas.blocksRaycasts = false;
+        // 启用角色
+        player.enabled = true;
+        Time.timeScale = 1;
     }
 
-    // 暂停游戏（禁用角色控制）
-    void PauseGame()
+    // 打开说明面板
+    public void OpenUI2()
     {
-        isGamePaused = true;
-        if (playerController != null)
-            playerController.enabled = false; // 禁用角色脚本，无法控制
-        Time.timeScale = 0; // 暂停游戏时间（可选，根据需求开启）
+        ui1Canvas.alpha = 0;
+        ui1Canvas.interactable = false;
+        ui1Canvas.blocksRaycasts = false;
+
+        ui2Canvas.alpha = 1;
+        ui2Canvas.interactable = true;
+        ui2Canvas.blocksRaycasts = true;
     }
 
-    // 恢复游戏（启用角色控制）
-    void ResumeGame()
+    // 打开设置面板
+    public void OpenUI3()
     {
-        isGamePaused = false;
-        if (playerController != null)
-            playerController.enabled = true; // 启用角色脚本，恢复控制
-        Time.timeScale = 1; // 恢复游戏时间
+        ui1Canvas.alpha = 0;
+        ui1Canvas.interactable = false;
+        ui1Canvas.blocksRaycasts = false;
+
+        ui3Canvas.alpha = 1;
+        ui3Canvas.interactable = true;
+        ui3Canvas.blocksRaycasts = true;
+    }
+
+    // 返回主菜单
+    public void ShowUI1()
+    {
+        ui1Canvas.alpha = 1;
+        ui1Canvas.interactable = true;
+        ui1Canvas.blocksRaycasts = true;
+
+        ui2Canvas.alpha = 0;
+        ui2Canvas.interactable = false;
+        ui2Canvas.blocksRaycasts = false;
+
+        ui3Canvas.alpha = 0;
+        ui3Canvas.interactable = false;
+        ui3Canvas.blocksRaycasts = false;
+
+        // 暂停游戏，角色禁用
+        player.enabled = false;
+        Time.timeScale = 0;
     }
 
     // 退出游戏
-    void QuitGame()
+    public void ExitGame()
     {
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
@@ -173,31 +96,28 @@ public class MenuManager : MonoBehaviour
             Application.Quit();
 #endif
     }
-    #endregion
 
-    #region 设置功能
-    // 亮度设置
-    void OnBrightnessChanged(float value)
+    // 音量变化
+    public void OnVolumeChanged()
     {
-        textBrightnessValue.text = $"亮度：{Mathf.RoundToInt(value)}";
-        // 这里可添加实际亮度调整逻辑，比如调整相机背景亮度、全局亮度等
-        // 示例：调整全局亮度（需根据项目需求实现）
-        // RenderSettings.ambientIntensity = value / 100f;
-        textBrightnessValue.text = $"亮度：{Mathf.RoundToInt(value)}";
-        PlayerPrefs.SetFloat("Brightness", value);
-        PlayerPrefs.Save();
+        float vol = sliderVol.value;
+        textVol.text = $"声音：{Mathf.RoundToInt(vol)}";
+        AudioListener.volume = vol / 100f;
     }
 
-    // 声音设置
-    void OnVolumeChanged(float value)
+    // 亮度变化
+    public void OnBrightChanged()
     {
-        textVolumeValue.text = $"声音：{Mathf.RoundToInt(value)}";
-        // 调整全局音量
-        AudioListener.volume = value / 100f;
-        textVolumeValue.text = $"声音：{Mathf.RoundToInt(value)}";
-        AudioListener.volume = value / 100f;
-        PlayerPrefs.SetFloat("Volume", value);
-        PlayerPrefs.Save();
+        float bright = sliderBright.value;
+        textBright.text = $"亮度：{Mathf.RoundToInt(bright)}";
     }
-    #endregion
+
+    // ESC呼出菜单
+    void Update()
+    {
+        if (player.enabled && Input.GetKeyDown(KeyCode.Escape))
+        {
+            ShowUI1();
+        }
+    }
 }
